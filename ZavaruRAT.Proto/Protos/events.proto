@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+option csharp_namespace = "ZavaruRAT.Proto";
+package zavarurat;
+
+import "google/protobuf/empty.proto";
+
+service EventHub {
+  rpc ClientConnected (ClientConnectedEvent) returns (google.protobuf.Empty);
+  rpc ClientDisconnected (ClientDisconnectedEvent) returns (google.protobuf.Empty);
+
+  rpc CommandExecuted (CommandExecutedEvent) returns (google.protobuf.Empty);
+
+  rpc Commands (google.protobuf.Empty) returns (stream CommandEvent);
+}
+
+message ClientDeviceInfo {
+  string OS = 1;
+  string motherboard = 2;
+  string CPU = 3;
+  string GPU = 4;
+  float RAM = 5;
+  repeated string drives = 6;
+}
+
+message ClientConnectedEvent {
+  string id = 1;
+  ClientDeviceInfo deviceInfo = 2;
+}
+
+message ClientDisconnectedEvent {
+  string id = 1;
+}
+
+message CommandEvent {
+  string client_id = 1; // client id
+  string hash_id = 2; // unique id
+
+  string command = 3;
+  bytes args = 4; // msgpack serialized data
+}
+
+message CommandExecutedEvent {
+  string client_id = 1; // client id
+  string hash_id = 2; // unique id
+  bool success = 3;
+
+  bytes result = 10; // msgpack serialized data
+}

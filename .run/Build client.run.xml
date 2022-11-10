@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="Build client" type="DotNetFolderPublish" factoryName="Publish to folder">
+        <riderPublish configuration="Release" platform="Any CPU" produce_single_file="true" ready_to_run="true"
+                      runtime="win-x64"
+                      target_folder="$PROJECT_DIR$/ZavaruRAT.Client/bin/Release/net7.0-windows/win-x64/publish"
+                      target_framework="net7.0-windows" uuid_high="9086474639917140663"
+                      uuid_low="-5755192392837867858"/>
+        <method v="2"/>
+    </configuration>
+</component>
