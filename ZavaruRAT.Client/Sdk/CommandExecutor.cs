@@ -22,11 +22,12 @@ public sealed class CommandExecutor
     public CommandExecutor AddModule<T>() where T : ModuleBase
     {
         var moduleType = typeof(T);
-        var taskType = typeof(Task<ExecutionResult>);
+        var taskType1 = typeof(Task<ExecutionResult>);
+        var taskType2 = typeof(Task<RealTimeExecutionResult>);
 
         foreach (var methodInfo in moduleType.GetMethods())
         {
-            if (methodInfo.IsPrivate || methodInfo.ReturnType != taskType)
+            if (methodInfo.IsPrivate || (methodInfo.ReturnType != taskType1 && methodInfo.ReturnType != taskType2))
             {
                 continue;
             }
@@ -55,7 +56,7 @@ public sealed class CommandExecutor
             Client = client
         };
 
-        ExecutionResult result;
+        ExecutionResult? result;
         try
         {
             var module = (ModuleBase)Activator.CreateInstance(method.DeclaringType!)!;
@@ -69,8 +70,16 @@ public sealed class CommandExecutor
                            ?[];
             }
 
-            var task = (Task<ExecutionResult>)method.Invoke(module, args)!;
-            result = await task;
+            var task = (Task)method.Invoke(module, args)!;
+            if (task.GetType() == typeof(Task<ExecutionResult>))
+            {
+                result = await (Task<ExecutionResult>)task;
+            }
+            else
+            {
+                await task;
+                result = null;
+            }
         }
         catch (Exception e)
         {
@@ -87,7 +96,17 @@ public sealed class CommandExecutor
         return new CommandResult
         {
             Status = CommandResultStatus.Success,
-            Result = result.Result
+            Result = result?.Result
         };
+    }
+
+    public bool IsRealTime(Command command)
+    {
+        if (!_commands.TryGetValue(command.CommandName, out var method))
+        {
+            return false;
+        }
+
+        return method.ReturnType.GetGenericArguments()[0] == typeof(RealTimeExecutionResult);
     }
 }

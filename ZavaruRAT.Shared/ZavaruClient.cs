@@ -145,7 +145,11 @@ public sealed class ZavaruClient : IDisposable
     public async Task<T?> ReceiveAsync<T>(int timeout = -1, CancellationToken cancellationToken = default)
         where T : class
     {
-        _networkStream.ReadTimeout = timeout;
+        if (timeout != -1)
+        {
+            var cts = new CancellationTokenSource(timeout);
+            cancellationToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cts.Token).Token;
+        }
 
         var buffer = new byte[sizeof(int)];
         var read = await _networkStream.ReadAsync(buffer.AsMemory(0, sizeof(int)), cancellationToken);
@@ -163,13 +167,7 @@ public sealed class ZavaruClient : IDisposable
         }
 
         buffer = _pool.Rent(length);
-        var received = await _networkStream.ReadAsync(buffer.AsMemory(0, length), cancellationToken);
-
-        if (received != length)
-        {
-            _pool.Return(buffer, true);
-            throw new SocketException();
-        }
+        await _networkStream.ReadExactlyAsync(buffer.AsMemory(0, length), cancellationToken);
 
         var o = MessagePackSerializer.Deserialize<T>(buffer, cancellationToken: cancellationToken);
         _pool.Return(buffer, true);

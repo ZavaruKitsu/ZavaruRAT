@@ -119,13 +119,53 @@ public sealed class ZavaruNodeService : BackgroundService
 
         _logger.LogInformation("Received command result {CommandResult}", result);
 
+        if (result?.Status == CommandResultStatus.RealTime)
+        {
+            await _server.SendCommandExecutedAsync(new CommandExecutedEvent
+            {
+                Success = result?.Status == CommandResultStatus.RealTime,
+                ClientId = command.ClientId,
+                HashId = command.HashId
+            });
+
+            await ProcessRealTime(command, storedClient);
+        }
+
         await _server.SendCommandExecutedAsync(new CommandExecutedEvent
         {
             Success = result?.Status == CommandResultStatus.Success,
             ClientId = command.ClientId,
             HashId = command.HashId,
             Result =
-                ByteString.CopyFrom(MessagePackSerializer.Serialize(result?.Result, ZavaruClient.SerializerOptions))
+                ByteString.CopyFrom(MessagePackSerializer.Serialize(result?.Result ?? Array.Empty<byte>(),
+                                                                    ZavaruClient.SerializerOptions))
         });
+    }
+
+    private async Task ProcessRealTime(CommandEvent command, ZavaruStoredClient client)
+    {
+        while (true)
+        {
+            _logger.LogInformation("Waiting for real time command result");
+
+            var result = await client.Client.ReceiveAsync<CommandResult>();
+            if (result?.Status == CommandResultStatus.Success)
+            {
+                _logger.LogInformation("Real time command break");
+                break;
+            }
+
+            _logger.LogInformation("Real time command result {CommandResult}", result);
+
+            await _server.SendCommandExecutedAsync(new CommandExecutedEvent
+            {
+                Success = result?.Status == CommandResultStatus.RealTime,
+                ClientId = command.ClientId,
+                HashId = command.HashId,
+                Result =
+                    ByteString.CopyFrom(MessagePackSerializer.Serialize(result?.Result ?? Array.Empty<byte>(),
+                                                                        ZavaruClient.SerializerOptions))
+            });
+        }
     }
 }

@@ -52,7 +52,7 @@ public sealed class ZavaruListenerService : BackgroundService
                 var client = await AcceptClientAsync(cancellationToken);
 
                 // todo: do not block current loop
-                var deviceInfo = await client.ReceiveAsync<DeviceInfo>(4, cancellationToken);
+                var deviceInfo = await client.ReceiveAsync<DeviceInfo>(4000, cancellationToken);
                 if (deviceInfo == null)
                 {
                     client.Dispose();

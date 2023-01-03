@@ -45,7 +45,7 @@ public sealed class EventService : EventHub.EventHubBase
     {
         _storage.CommandExecuted(request);
 
-        _logger.LogInformation("Result {Result}", request);
+        _logger.LogInformation("Result {HashId}: {Result}", request.HashId, request.Success);
 
         return Task.FromResult(new Empty());
     }

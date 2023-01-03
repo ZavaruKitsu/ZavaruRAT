@@ -45,7 +45,7 @@ public sealed class AdminService : AdminHub.AdminHubBase
 
             await foreach (var ev in commands.ToAsyncEnumerable().WithCancellation(context.CancellationToken))
             {
-                _logger.LogInformation("Sending command executed event {Command}", ev);
+                _logger.LogInformation("Sending command executed event");
 
                 await responseStream.WriteAsync(ev);
             }

