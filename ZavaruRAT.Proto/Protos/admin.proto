@@ -9,11 +9,31 @@ import "events.proto";
 service AdminHub {
   rpc InvokeCommand(InvokeCommandRequest) returns (google.protobuf.Empty);
 
-  rpc CommandResults (google.protobuf.Empty) returns (stream CommandExecutedEvent);
+  rpc NetworkStatistics(google.protobuf.Empty) returns (Statistics);
+  rpc ClientExists(ClientExistsRequest) returns (ClientExistsResponse);
+
+  rpc CommandResults (CommandResultsRequest) returns (stream CommandExecutedEvent);
+}
+
+message CommandResultsRequest {
+  string hashId = 1;
 }
 
 message InvokeCommandRequest {
   string client_id = 1;
   string hash_id = 2;
   string command = 3;
+}
+
+message Statistics {
+  int32 clients = 1;
+  int32 nodes = 2;
+}
+
+message ClientExistsRequest {
+  string client_id = 1;
+}
+
+message ClientExistsResponse {
+  bool exists = 1;
 }

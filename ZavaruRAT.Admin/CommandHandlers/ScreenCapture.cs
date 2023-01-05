@@ -41,28 +41,24 @@ public class ScreenCapture : CommandHandler
             {
                 await foreach (var commandResult in results.ResponseStream.ReadAllAsync(cts.Token))
                 {
-                    if (commandResult.HashId == hashId)
+                    if (commandResult.Result.IsEmpty)
                     {
-                        if (commandResult.Result.IsEmpty)
-                        {
-                            continue;
-                        }
-
-                        pictureBox.BeginInvoke(() =>
-                        {
-                            var image =
-                                (byte[])MessagePackSerializer.Typeless.Deserialize(commandResult.Result.ToByteArray());
-
-                            using var ms = new MemoryStream();
-                            ms.Write(image);
-                            ms.Position = 0;
-
-                            pictureBox.Image = Image.FromStream(ms);
-                            pictureBox.Refresh();
-                        });
+                        Console.WriteLine("Skipping command result: {0}", commandResult.HashId);
+                        continue;
                     }
 
-                    Console.WriteLine("Skipping command result: {0}", commandResult.HashId);
+                    pictureBox.BeginInvoke(() =>
+                    {
+                        var image =
+                            (byte[])MessagePackSerializer.Typeless.Deserialize(commandResult.Result.ToByteArray());
+
+                        using var ms = new MemoryStream();
+                        ms.Write(image);
+                        ms.Position = 0;
+
+                        pictureBox.Image = Image.FromStream(ms);
+                        pictureBox.Refresh();
+                    });
                 }
             }
         }, TaskCreationOptions.LongRunning);

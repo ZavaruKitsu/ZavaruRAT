@@ -92,7 +92,7 @@ public static class Utilities
 
         os.Drives = DriveInfo.GetDrives().Where(x => x.IsReady)
                              .Select(x =>
-                                         $"{x.VolumeLabel} ({x.Name[..2]}) : {x.AvailableFreeSpace / 1048576.0f / 1024.0f:F1} / {x.TotalSize / 1048576.0f / 1024.0f:F1} GB")
+                                         $"{x.VolumeLabel} ({x.Name[..2]}) - {x.AvailableFreeSpace / 1048576.0f / 1024.0f:F1} / {x.TotalSize / 1048576.0f / 1024.0f:F1} GB")
                              .ToArray();
 
         return os;

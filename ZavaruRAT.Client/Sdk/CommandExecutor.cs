@@ -83,7 +83,7 @@ public sealed class CommandExecutor
         }
         catch (Exception e)
         {
-            Debug.WriteLine("Error while executing command {0}", command.CommandName);
+            Debug.WriteLine("Error while executing command {0}", (object)command.CommandName);
             Debug.WriteLine(e);
 
             return new CommandResult
