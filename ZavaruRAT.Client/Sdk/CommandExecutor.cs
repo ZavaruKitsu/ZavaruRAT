@@ -71,7 +71,7 @@ public sealed class CommandExecutor
             }
 
             var task = (Task)method.Invoke(module, args)!;
-            if (task.GetType() == typeof(Task<ExecutionResult>))
+            if (method.ReturnType == typeof(Task<ExecutionResult>))
             {
                 result = await (Task<ExecutionResult>)task;
             }

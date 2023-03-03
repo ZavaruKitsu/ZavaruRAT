@@ -16,7 +16,7 @@ service AdminHub {
 }
 
 message CommandResultsRequest {
-  string hashId = 1;
+  string hash_id = 1;
 }
 
 message InvokeCommandRequest {
@@ -28,6 +28,19 @@ message InvokeCommandRequest {
 message Statistics {
   int32 clients = 1;
   int32 nodes = 2;
+
+  repeated StatisticsNode nodesList = 3;
+}
+
+message StatisticsNode {
+  string id = 1;
+
+  repeated StatisticsClient clients = 2;
+}
+
+message StatisticsClient {
+  string client_id = 1;
+  string motherboard = 2;
 }
 
 message ClientExistsRequest {

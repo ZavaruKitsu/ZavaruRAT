@@ -40,7 +40,22 @@ public sealed class AdminService : AdminHub.AdminHubBase
         var stats = new Statistics
         {
             Clients = _storage.Clients.Sum(x => x.Value.Count),
-            Nodes = _storage.Clients.Count
+            Nodes = _storage.Clients.Count,
+            NodesList =
+            {
+                _storage.Clients.Select(x => new StatisticsNode
+                {
+                    Id = x.Key,
+                    Clients =
+                    {
+                        x.Value.Select(y => new StatisticsClient
+                        {
+                            ClientId = y.Id.ToString(),
+                            Motherboard = y.DeviceInfo.Motherboard
+                        })
+                    }
+                })
+            }
         };
 
         return Task.FromResult(stats);

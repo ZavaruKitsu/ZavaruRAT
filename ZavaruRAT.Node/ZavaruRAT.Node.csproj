@@ -9,16 +9,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Grpc.Net.ClientFactory" Version="2.49.0"/>
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0"/>
-        <PackageReference Include="Serilog.Extensions.Hosting" Version="5.0.1"/>
-        <PackageReference Include="System.Linq.Async" Version="6.0.1"/>
-        <PackageReference Include="System.Reactive.Linq" Version="5.0.0"/>
+        <PackageReference Include="Grpc.Net.ClientFactory" Version="2.51.0" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
+        <PackageReference Include="Serilog.Extensions.Hosting" Version="5.0.1" />
+        <PackageReference Include="System.Linq.Async" Version="6.0.1" />
+        <PackageReference Include="System.Reactive.Linq" Version="5.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\ZavaruRAT.Proto\ZavaruRAT.Proto.csproj"/>
-        <ProjectReference Include="..\ZavaruRAT.Shared\ZavaruRAT.Shared.csproj"/>
+        <ProjectReference Include="..\ZavaruRAT.Proto\ZavaruRAT.Proto.csproj" />
+        <ProjectReference Include="..\ZavaruRAT.Shared\ZavaruRAT.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,5 +1,6 @@
 ﻿#region
 
+using System.Text;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Net.Client;
@@ -8,6 +9,8 @@ using ZavaruRAT.Admin.CommandHandlers;
 using ZavaruRAT.Proto;
 
 #endregion
+
+Console.OutputEncoding = Encoding.UTF8;
 
 var channel = GrpcChannel.ForAddress("https://localhost:5001");
 var adminClient = new AdminHub.AdminHubClient(channel);
@@ -21,21 +24,33 @@ async Task ExecuteClientCommand()
 {
     Console.Clear();
 
-    var stats = adminClient.NetworkStatistics(new Empty());
+    var stats = await adminClient.NetworkStatisticsAsync(new Empty());
     Console.WriteLine($"Nodes: {stats.Nodes}, clients: {stats.Clients}");
     Console.WriteLine();
+
+    foreach (var node in stats.NodesList)
+    {
+        Console.WriteLine($"• {node.Id}");
+
+        foreach (var client in node.Clients)
+        {
+            Console.WriteLine($"  ◦ {client.ClientId} ({client.Motherboard})");
+        }
+
+        Console.WriteLine();
+    }
 
     // wait until someone connects
     if (stats.Clients == 0)
     {
-        Thread.Sleep(1000);
+        await Task.Delay(1000);
         return;
     }
 
     Console.Write("Client ID > ");
     var clientId = Console.ReadLine()!;
 
-    var clientExists = adminClient.ClientExists(new ClientExistsRequest
+    var clientExists = await adminClient.ClientExistsAsync(new ClientExistsRequest
     {
         ClientId = clientId
     });
@@ -60,7 +75,7 @@ async Task ExecuteClientCommand()
         HashId = hashId
     });
 
-    adminClient.InvokeCommand(new InvokeCommandRequest
+    await adminClient.InvokeCommandAsync(new InvokeCommandRequest
     {
         ClientId = clientId,
         HashId = hashId,
@@ -123,6 +138,7 @@ while (true)
     Console.WriteLine();
     Console.WriteLine("1. Execute command on a specified client");
     Console.WriteLine("2. Exit");
+    Console.WriteLine();
 
     var key = Console.ReadKey(true);
 
@@ -135,5 +151,5 @@ while (true)
             return;
     }
 
-    Thread.Sleep(5000);
+    await Task.Delay(5000);
 }
