@@ -1,0 +1,6 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Publish cleaner" type="DotNetFolderPublish" factoryName="Publish to folder">
+    <riderPublish configuration="Release" platform="Any CPU" produce_single_file="true" runtime="win-x64" target_folder="$PROJECT_DIR$/Release" target_framework="net7.0-windows" uuid_high="1563974565149689398" uuid_low="-5687816881185944750" />
+    <method v="2" />
+  </configuration>
+</component>

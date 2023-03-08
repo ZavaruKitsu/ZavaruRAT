@@ -1,5 +1,6 @@
 ﻿#region
 
+using System.Diagnostics;
 using System.Reflection;
 
 #endregion
@@ -40,3 +41,18 @@ catch (Exception e)
 }
 
 Console.WriteLine("[+] Autostart removed");
+
+foreach (var process in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(fullPath)))
+{
+    var pid = process.Id;
+
+    try
+    {
+        process.Kill();
+        Console.WriteLine($"[+] Process with PID {pid} killed");
+    }
+    catch
+    {
+        Console.WriteLine($"[-] Failed to kill process with PID {pid}");
+    }
+}

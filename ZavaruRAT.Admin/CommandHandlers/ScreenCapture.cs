@@ -31,6 +31,7 @@ public class ScreenCapture : CommandHandler
 
         var pictureBox = new PictureBox();
         pictureBox.Dock = DockStyle.Fill;
+        pictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
         form.Controls.Add(pictureBox);
 
         var cts = new CancellationTokenSource();

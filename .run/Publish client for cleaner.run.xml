@@ -1,0 +1,6 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Publish client for cleaner" type="DotNetFolderPublish" factoryName="Publish to folder">
+    <riderPublish configuration="Release" delete_existing_files="true" platform="Any CPU" runtime="Portable" target_folder="$PROJECT_DIR$/Release/ClientUnpacked" target_framework="net7.0-windows" uuid_high="9086474639917140663" uuid_low="-5755192392837867858" />
+    <method v="2" />
+  </configuration>
+</component>
