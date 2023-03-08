@@ -32,7 +32,7 @@ public class FunModule : ModuleBase
         var res = PInvoke.BlockInput(true);
         return Task.FromResult(new ExecutionResult
         {
-            Result = res
+            Result = res.Value
         });
     }
 
@@ -41,7 +41,7 @@ public class FunModule : ModuleBase
         var res = PInvoke.BlockInput(false);
         return Task.FromResult(new ExecutionResult
         {
-            Result = res
+            Result = res.Value
         });
     }
 }
