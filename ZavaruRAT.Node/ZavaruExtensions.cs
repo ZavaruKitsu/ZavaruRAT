@@ -32,7 +32,7 @@ public static class ZavaruExtensions
 
     public static GrpcChannel CreateChannel(IConfiguration configuration)
     {
-        var credentials = CallCredentials.FromInterceptor((context, metadata) =>
+        var credentials = CallCredentials.FromInterceptor((_, metadata) =>
         {
             metadata.Add("Authorization", $"{configuration["Grpc:Token"]}:{configuration["NodeId"]}");
             return Task.CompletedTask;

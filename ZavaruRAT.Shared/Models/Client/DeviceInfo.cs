@@ -7,7 +7,7 @@ using MessagePack;
 namespace ZavaruRAT.Shared.Models.Client;
 
 [MessagePackObject]
-public class DeviceInfo
+public sealed class DeviceInfo
 {
     public static readonly DeviceInfo Empty = new();
 
@@ -19,4 +19,7 @@ public class DeviceInfo
 
     [Key(4)] public float RAM { get; set; } // in gb
     [Key(5)] public string[] Drives { get; set; } = null!;
+
+    [Key(100)] public string InstallationPath { get; set; } = null!;
+    [Key(101)] public bool AutoStart { get; set; }
 }

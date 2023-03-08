@@ -19,12 +19,15 @@ public sealed class ZavaruNodeService : BackgroundService
 {
     private readonly MainServerClient _server;
     private readonly ZavaruClientsStorage _storage;
+    private readonly NodeCommandsExecutor _nodeExecutor;
     private readonly ILogger<ZavaruNodeService> _logger;
 
-    public ZavaruNodeService(MainServerClient server, ZavaruClientsStorage storage, ILogger<ZavaruNodeService> logger)
+    public ZavaruNodeService(MainServerClient server, ZavaruClientsStorage storage, NodeCommandsExecutor nodeExecutor,
+                             ILogger<ZavaruNodeService> logger)
     {
         _server = server;
         _storage = storage;
+        _nodeExecutor = nodeExecutor;
         _logger = logger;
     }
 
@@ -106,6 +109,12 @@ public sealed class ZavaruNodeService : BackgroundService
                 Result = ByteString.CopyFrom(MessagePackSerializer.Serialize(ClientNotFound.Instance,
                                                                              ZavaruClient.SerializerOptions))
             });
+            return;
+        }
+
+        if (_nodeExecutor.IsNodeCommand(command))
+        {
+            await _nodeExecutor.ExecuteNodeCommand(command, storedClient);
             return;
         }
 

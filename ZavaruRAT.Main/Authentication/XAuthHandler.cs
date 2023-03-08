@@ -27,7 +27,7 @@ public sealed class XAuthHandler : AuthenticationHandler<XAuthSchemeOptions>
     {
         if (!Request.Headers.ContainsKey(HeaderNames.Authorization))
         {
-            return Task.FromResult(AuthenticateResult.Fail("No token provided (not header)"));
+            return Task.FromResult(AuthenticateResult.Fail("No token provided (no header)"));
         }
 
         var header = Request.Headers.Authorization[0];

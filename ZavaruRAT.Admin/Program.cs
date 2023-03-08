@@ -47,8 +47,17 @@ async Task ExecuteClientCommand()
         return;
     }
 
-    Console.Write("Client ID > ");
-    var clientId = Console.ReadLine()!;
+    string clientId;
+    while (true)
+    {
+        Console.Write("Client ID > ");
+        clientId = Console.ReadLine()!;
+
+        if (Guid.TryParse(clientId, out _))
+        {
+            break;
+        }
+    }
 
     var clientExists = await adminClient.ClientExistsAsync(new ClientExistsRequest
     {
