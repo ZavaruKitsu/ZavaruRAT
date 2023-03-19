@@ -16,8 +16,9 @@ public sealed class FileStealerModule : ModuleBase
 
     private static readonly List<string> DocsIgnore = new()
     {
-        "system32",
-        "program files",
+        "System32",
+        "Program Files",
+        "Program Files (x86)",
         "windows",
         "Adobe",
         "JetBrains",

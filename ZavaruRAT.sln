@@ -14,8 +14,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZavaruRAT.Shared.Tests", "Z
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZavaruRAT.Admin", "ZavaruRAT.Admin\ZavaruRAT.Admin.csproj", "{6926A213-CE40-4D06-9115-046263EB1E01}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZavaruRAT.Cleaner", "ZavaruRAT.Cleaner\ZavaruRAT.Cleaner.csproj", "{15B45A94-A97E-4636-B110-D0AE91710B52}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,9 +48,5 @@ Global
 		{6926A213-CE40-4D06-9115-046263EB1E01}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6926A213-CE40-4D06-9115-046263EB1E01}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6926A213-CE40-4D06-9115-046263EB1E01}.Release|Any CPU.Build.0 = Release|Any CPU
-		{15B45A94-A97E-4636-B110-D0AE91710B52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{15B45A94-A97E-4636-B110-D0AE91710B52}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{15B45A94-A97E-4636-B110-D0AE91710B52}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{15B45A94-A97E-4636-B110-D0AE91710B52}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -59,7 +59,7 @@ public sealed class ZavaruListenerService : BackgroundService
                     continue;
                 }
 
-                var storedClient = _storage.AddClient(client, deviceInfo!);
+                var storedClient = _storage.AddClient(client, deviceInfo);
 
                 await _server.SendClientConnected(new ClientConnectedEvent
                 {

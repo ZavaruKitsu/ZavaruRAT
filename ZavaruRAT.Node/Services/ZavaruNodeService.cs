@@ -85,7 +85,17 @@ public sealed class ZavaruNodeService : BackgroundService
         {
             _logger.LogInformation("New command from server: {Command}", command);
 
-            await Task.Factory.StartNew(async () => await ExecuteCommandAsync(command), TaskCreationOptions.LongRunning)
+            await Task.Factory.StartNew(async () =>
+                      {
+                          try
+                          {
+                              await ExecuteCommandAsync(command);
+                          }
+                          catch (Exception e)
+                          {
+                              _logger.LogError(e, "Error while processing {Command}", command);
+                          }
+                      }, TaskCreationOptions.LongRunning)
                       .ConfigureAwait(false);
         }
 
@@ -130,13 +140,6 @@ public sealed class ZavaruNodeService : BackgroundService
 
         if (result?.Status == CommandResultStatus.RealTime)
         {
-            await _server.SendCommandExecutedAsync(new CommandExecutedEvent
-            {
-                Success = result?.Status == CommandResultStatus.RealTime,
-                ClientId = command.ClientId,
-                HashId = command.HashId
-            });
-
             await ProcessRealTime(command, storedClient);
         }
 
@@ -158,7 +161,7 @@ public sealed class ZavaruNodeService : BackgroundService
             _logger.LogInformation("Waiting for real time command result");
 
             var result = await client.Client.ReceiveAsync<CommandResult>();
-            if (result?.Status == CommandResultStatus.Success)
+            if (result?.Status != CommandResultStatus.RealTime)
             {
                 _logger.LogInformation("Real time command break");
                 break;
@@ -168,13 +171,15 @@ public sealed class ZavaruNodeService : BackgroundService
 
             await _server.SendCommandExecutedAsync(new CommandExecutedEvent
             {
-                Success = result?.Status == CommandResultStatus.RealTime,
+                Success = true,
                 ClientId = command.ClientId,
                 HashId = command.HashId,
                 Result =
-                    ByteString.CopyFrom(MessagePackSerializer.Serialize(result?.Result ?? Array.Empty<byte>(),
+                    ByteString.CopyFrom(MessagePackSerializer.Serialize(result.Result ?? Array.Empty<byte>(),
                                                                         ZavaruClient.SerializerOptions))
             });
         }
+
+        // smth else in buffer
     }
 }

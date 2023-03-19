@@ -1,8 +1,6 @@
 #region
 
 using System.Net.Sockets;
-using ZavaruRAT.Proto;
-using ZavaruRAT.Shared.Models.Client;
 
 #endregion
 
@@ -31,26 +29,5 @@ public static class ZavaruExtensions
         {
             return false;
         }
-    }
-
-    /// <summary>
-    ///     Maps <see cref="DeviceInfo" /> to <see cref="ClientDeviceInfo" />
-    /// </summary>
-    /// <param name="deviceInfo">The original device info</param>
-    /// <returns>Mapped proto object</returns>
-    public static ClientDeviceInfo ToProto(this DeviceInfo deviceInfo)
-    {
-        return new ClientDeviceInfo
-        {
-            OS = deviceInfo.OS,
-            Motherboard = deviceInfo.Motherboard,
-            CPU = deviceInfo.CPU,
-            GPU = deviceInfo.GPU,
-            RAM = deviceInfo.RAM,
-            Drives =
-            {
-                deviceInfo.Drives
-            }
-        };
     }
 }

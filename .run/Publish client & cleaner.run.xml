@@ -1,8 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Publish client &amp; cleaner" type="CompoundRunConfigurationType">
-    <toRun name="Publish cleaner" type="DotNetFolderPublish" />
-    <toRun name="Publish client" type="DotNetFolderPublish" />
-    <toRun name="Publish client for cleaner" type="DotNetFolderPublish" />
-    <method v="2" />
-  </configuration>
-</component>

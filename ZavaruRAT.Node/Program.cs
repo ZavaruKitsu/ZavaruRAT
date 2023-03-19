@@ -20,7 +20,7 @@ host.ConfigureServices((app, services) =>
 
     foreach (var command in commands)
     {
-        services.AddScoped(command);
+        services.AddSingleton(command);
     }
 
     services.AddSingleton<NodeCommandsExecutor>(provider =>

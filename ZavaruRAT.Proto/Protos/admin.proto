@@ -23,6 +23,7 @@ message InvokeCommandRequest {
   string client_id = 1;
   string hash_id = 2;
   string command = 3;
+  repeated string arguments = 4;
 }
 
 message Statistics {

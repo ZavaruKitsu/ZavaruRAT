@@ -1,9 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-    <configuration name="Start everything" default="false" type="CompoundRunConfigurationType">
-        <toRun name="ZavaruRAT.Main" type="LaunchSettings" />
-        <toRun name="ZavaruRAT.Admin" type="DotNetProject" />
-        <toRun name="ZavaruRAT.Client" type="DotNetProject" />
-        <toRun name="ZavaruRAT.Node" type="DotNetProject" />
-        <method v="2" />
-    </configuration>
-</component>

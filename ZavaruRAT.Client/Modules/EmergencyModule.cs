@@ -41,26 +41,8 @@ del /f ""{currentExe}""
 
     public Task<ExecutionResult> Restart()
     {
-        var currentExe = Installation.ExecutablePath;
-        var currentPid = Environment.ProcessId;
+        Installation.Restart();
 
-        var cmd = $@"
-ping 127.0.0.1 -n 2 > nul
-taskkill /pid {currentPid} /f
-ping 127.0.0.1 -n 3 > nul
-start {currentExe}
-".Commandify();
-
-        Debug.WriteLine(cmd);
-
-        var procInfo = new ProcessStartInfo
-        {
-            FileName = "cmd",
-            Arguments = "/c " + cmd,
-            WorkingDirectory = Path.GetDirectoryName(currentExe)
-        };
-        Process.Start(procInfo);
-
-        throw new ApplicationException("See you in 5 seconds!");
+        return Task.FromResult(new ExecutionResult());
     }
 }

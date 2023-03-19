@@ -22,8 +22,8 @@ public sealed class ZavaruClient : IDisposable
                                     .WithAllowAssemblyVersionMismatch(true)
                                     .WithResolver(new TypelessContractlessStandardResolver());
 
+    private readonly SemaphoreSlim _receiveSemaphore = new(1, 1);
     private NetworkStream _networkStream = null!;
-
     private TcpClient _tcpClient = null!;
 
     private ZavaruClient(string ip, int port)
@@ -145,10 +145,29 @@ public sealed class ZavaruClient : IDisposable
     public async Task<T?> ReceiveAsync<T>(int timeout = -1, CancellationToken cancellationToken = default)
         where T : class
     {
+        await _receiveSemaphore.WaitAsync(cancellationToken);
+
+        var released = false;
+
         if (timeout != -1)
         {
             var cts = new CancellationTokenSource(timeout);
             cancellationToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cts.Token).Token;
+            cancellationToken.Register(() =>
+            {
+                try
+                {
+                    // ReSharper disable once AccessToModifiedClosure
+                    if (!released)
+                    {
+                        _receiveSemaphore.Release();
+                    }
+                }
+                catch
+                {
+                    // ignored
+                }
+            });
         }
 
         var buffer = new byte[sizeof(int)];
@@ -156,6 +175,8 @@ public sealed class ZavaruClient : IDisposable
 
         if (read != sizeof(int))
         {
+            _receiveSemaphore.Release();
+            released = true;
             return null;
         }
 
@@ -163,6 +184,8 @@ public sealed class ZavaruClient : IDisposable
 
         if (length > SerializerMaxLength)
         {
+            _receiveSemaphore.Release();
+            released = true;
             throw new OverflowException($"Object is too large ({length} > {SerializerMaxLength})");
         }
 
@@ -172,6 +195,8 @@ public sealed class ZavaruClient : IDisposable
         var o = MessagePackSerializer.Deserialize<T>(buffer, cancellationToken: cancellationToken);
         _pool.Return(buffer, true);
 
+        _receiveSemaphore.Release();
+        released = true;
         return o;
     }
 

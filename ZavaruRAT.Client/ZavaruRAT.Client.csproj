@@ -8,6 +8,13 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Company>Unknown Systems Ltd.</Company>
         <Product>Unknown Product</Product>
+        <Description>Unknown</Description>
+        <ProductName>Unknown Application</ProductName>
+        <AssemblyName>Unknown Application</AssemblyName>
+        <AssemblyTitle>Unknown Application</AssemblyTitle>
+        <Title>Unknown Application</Title>
+        <TargetName>Unknown Application</TargetName>
+        <RootNamespace>Unknown Application</RootNamespace>
         <AssemblyVersion>1.0.2.3</AssemblyVersion>
         <FileVersion>1.0.2.3</FileVersion>
         <NeutralLanguage>en-US</NeutralLanguage>

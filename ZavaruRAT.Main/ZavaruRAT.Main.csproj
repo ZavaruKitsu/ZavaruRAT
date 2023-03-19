@@ -18,4 +18,11 @@
         <ProjectReference Include="..\ZavaruRAT.Shared\ZavaruRAT.Shared.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Content Remove="appsettings.Example.json" />
+        <None Include="appsettings.Example.json">
+            <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
 </Project>

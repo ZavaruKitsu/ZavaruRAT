@@ -39,14 +39,22 @@ public sealed class ScreenShareModule : ModuleBase
 
             try
             {
-                _ = await Context.Client.ReceiveAsync<Command>(50);
-                break;
+                var mock = await Context.Client.ReceiveAsync<Command>(500);
+                if (mock != null)
+                {
+                    await Context.Client.SendAsync(CommandResult.Empty);
+
+                    break;
+                }
             }
             catch
             {
+                Debug.WriteLine("No stop so continue");
                 // ignored
             }
         }
+
+        Debug.WriteLine("Sending finished");
 
         return new RealTimeExecutionResult();
     }

